@@ -126,3 +126,87 @@ func TestSkillsCommandHasListSubcommand(t *testing.T) {
 		t.Error("skillsCmd missing 'list' subcommand")
 	}
 }
+
+func TestSkillsAddCommandExists(t *testing.T) {
+	// Verify skillsAddCmd is properly configured
+	if skillsAddCmd.Use != "add <source>" {
+		t.Errorf("skillsAddCmd.Use = %q, want %q", skillsAddCmd.Use, "add <source>")
+	}
+}
+
+func TestSkillsCommandHasAddSubcommand(t *testing.T) {
+	// Verify skillsAddCmd is registered as subcommand
+	found := false
+	for _, cmd := range skillsCmd.Commands() {
+		if cmd.Use == "add <source>" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("skillsCmd missing 'add' subcommand")
+	}
+}
+
+func TestSkillsAddCommandFlags(t *testing.T) {
+	// Verify --local flag exists
+	localFlag := skillsAddCmd.Flags().Lookup("local")
+	if localFlag == nil {
+		t.Error("skillsAddCmd missing --local flag")
+	} else if localFlag.DefValue != "false" {
+		t.Errorf("--local default = %q, want %q", localFlag.DefValue, "false")
+	}
+
+	// Verify --name flag exists
+	nameFlag := skillsAddCmd.Flags().Lookup("name")
+	if nameFlag == nil {
+		t.Error("skillsAddCmd missing --name flag")
+	} else if nameFlag.DefValue != "" {
+		t.Errorf("--name default = %q, want %q", nameFlag.DefValue, "")
+	}
+}
+
+func TestScopeString(t *testing.T) {
+	tests := []struct {
+		local bool
+		want  string
+	}{
+		{false, "team"},
+		{true, "local"},
+	}
+
+	for _, tt := range tests {
+		got := scopeString(tt.local)
+		if got != tt.want {
+			t.Errorf("scopeString(%v) = %q, want %q", tt.local, got, tt.want)
+		}
+	}
+}
+
+func TestSkillsLoadCommandExists(t *testing.T) {
+	// Verify skillsLoadCmd is properly configured
+	if skillsLoadCmd.Use != "load <name>" {
+		t.Errorf("skillsLoadCmd.Use = %q, want %q", skillsLoadCmd.Use, "load <name>")
+	}
+}
+
+func TestSkillsCommandHasLoadSubcommand(t *testing.T) {
+	// Verify skillsLoadCmd is registered as subcommand
+	found := false
+	for _, cmd := range skillsCmd.Commands() {
+		if cmd.Use == "load <name>" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("skillsCmd missing 'load' subcommand")
+	}
+}
+
+func TestSkillsLoadCommandRequiresArg(t *testing.T) {
+	// Verify the command requires exactly one argument
+	if skillsLoadCmd.Args == nil {
+		t.Error("skillsLoadCmd.Args is nil, expected ExactArgs(1)")
+	}
+}
